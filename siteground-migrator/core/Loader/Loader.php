@@ -132,7 +132,7 @@ class Loader {
 		// Register the stylesheets for the admin area.
 		add_action( 'admin_enqueue_scripts', array( $this->admin, 'enqueue_styles' ), 111 );
 		// Register the JavaScript for the admin area.
-		add_action( 'admin_enqueue_scripts', array( $this->admin, 'enqueue_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this->admin, 'enqueue_scripts' ), 111 );
 		// Add styles to WordPress admin head.
 		add_action( 'admin_print_styles', array( $this->admin, 'admin_print_styles' ) );
 

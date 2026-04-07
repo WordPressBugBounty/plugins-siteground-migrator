@@ -1,11 +1,11 @@
 === SiteGround Migrator ===
-Contributors: Hristo Sg, sstoqnov, SiteGround, stoyangeorgiev, elenachavdarova, ignatggeorgiev
+Contributors: Hristo Sg, sstoqnov, SiteGround, stoyangeorgiev, elenachavdarova, ignatggeorgiev, asparuhtenev
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: Transfer, Migration, SiteGround, automatic transfer, automatic migration
 Requires at least: 4.8
 Tested up to: 6.9
-Stable tag: 2.0.9
+Stable tag: 2.1.0
 Requires PHP: 5.6.0
 
 Transfer your WordPress website to SiteGround without any hassle in a completely automated way using SiteGround Migrator.
@@ -46,6 +46,13 @@ In version 1.0.13 we've added WP-CLI command for migrations.
 * wp migrator start transfertoken --email=your@email.com
 
 == Changelog ==
+
+= Version 2.1.0 =
+Release Date: Apr 7th, 2026
+
+* WP CLI improvements
+* Layout improvements
+* Environmental check improvements
 
 = Version 2.0.9 =
 Release Date: Apr 24th, 2023
@@ -292,3 +299,4 @@ Unfortunately, our plugin works on environments that we have no control over. Th
 3. Downloading your site files to the SiteGround server
 4. Once data migration is completed, we will set your site on the new server, even change its url if necessary
 5. Migration completed! We've generated a temporary URL for you to verify your site on the new server
+

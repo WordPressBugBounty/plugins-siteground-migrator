@@ -78,7 +78,7 @@ class Cli_Migrator {
 				break;
 
 			case 5:
-				Transfer_Service::get_instance()->transfer_continue();
+				Transfer_Service::get_instance()->run_background_processes();
 				\WP_CLI::success( esc_html__( 'Transfer started. Creating archives of files...', 'siteground-migrator' ) );
 				break;
 

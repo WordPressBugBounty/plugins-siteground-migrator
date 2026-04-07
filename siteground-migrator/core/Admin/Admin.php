@@ -28,6 +28,16 @@ class Admin {
 		'mks_shortcodes_simple_line_icons', // Meks Flexible Shortcodes.
 		'onthego-admin-styles', // Toolset Types
 		'foogra-icons', // Foogra Theme
+		'elegant', // Elegant Icons-set
+	);
+
+	/**
+	 * Scripts to be dequeued.
+	 *
+	 * @var array
+	 */
+	public $dequeued_scripts = array(
+		'wc-admin-wcsettings-deprecation', // Woocommerce JS error introducing file.
 	);
 
 	/**
@@ -116,6 +126,11 @@ class Admin {
 		// Bail if this is not our settgins page.
 		if ( false === $this->is_plugin_page() ) {
 			return;
+		}
+
+		// Dequeue conflicting scripts.
+		foreach ( $this->dequeued_scripts as $script ) {
+			wp_dequeue_script( $script );
 		}
 
 		// Enqueue the siteground-migrator script.
