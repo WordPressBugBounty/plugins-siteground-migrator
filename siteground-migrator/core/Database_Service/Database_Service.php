@@ -14,6 +14,7 @@ use ShuttleExport\Dumper\Factory;
  *
  * Provides tools to retrieve information about the size of database and exporting database tables.
  */
+
 class Database_Service {
 	use Log_Service_Trait;
 	/**
@@ -24,6 +25,12 @@ class Database_Service {
 	 * @since 1.0.0
 	 */
 	private $files_service;
+
+	/**
+	 * The Database placeholder.
+	 */
+	public $wpdb;
+
 
 	/**
 	 * The constructor
@@ -38,7 +45,7 @@ class Database_Service {
 	}
 
 	/**
-	 * Retrieve information about the tabels
+	 * Retrieve information about the tables
 	 * in database and the size of each one.
 	 *
 	 * @since  1.0.0
@@ -48,22 +55,24 @@ class Database_Service {
 	private function get_tables() {
 		// Load the global `wpdb`.
 		global $wpdb;
+		$this->wpdb = $wpdb;
 
 		// Get the tables information.
-		$tables = $wpdb->get_results(
-			$wpdb->prepare(
-				"
-				SELECT
-					table_name AS 'table_name',
-					ROUND( ( data_length + index_length ), 2 ) AS 'size'
-				FROM information_schema.TABLES
-				WHERE table_schema = %s
-				AND table_name LIKE %s
-				",
-				DB_NAME,
-				$wpdb->prefix . '%'
-			)
-		); // WPCS: cache ok.
+		$query = $this->wpdb->prepare(
+			"
+			SELECT
+				table_name AS 'table_name',
+				ROUND( ( data_length + index_length ), 2 ) AS 'size'
+			FROM information_schema.TABLES
+			WHERE table_schema = %s
+			AND table_name LIKE %s
+			",
+			DB_NAME,
+			$this->wpdb->prefix . '%'
+		);
+
+		// WPCS: cache ok.
+		$tables = $wpdb->get_results( $query ); // phpcs:ignore.
 
 		// Return the tables info.
 		return $tables;
@@ -104,7 +113,7 @@ class Database_Service {
 	}
 
 	/**
-	 * Export and encypt mysql table.
+	 * Export and encrypt MySQL table.
 	 *
 	 * @since  1.0.0
 	 *
@@ -142,9 +151,9 @@ class Database_Service {
 		// Encrypt the dump file and detele the original one.
 		$encryption_result = $this->files_service->encrypt_and_delete_original( $filename );
 
-		// Check if the encryption was successfull.
+		// Check if the encryption was successful.
 		if ( false === $encryption_result ) {
-			// translators: The filename of mysql dump.
+			// translators: The filename of MySQL dump.
 			$this->log_error( sprintf( 'Error encrypting database: %s', $filename ) );
 			return 1;
 		}
@@ -164,7 +173,6 @@ class Database_Service {
 		// Load the global `$wpdb`.
 		global $wpdb;
 
-		// Get the size of database.
 		$response = $wpdb->get_results(
 			$wpdb->prepare(
 				"SELECT

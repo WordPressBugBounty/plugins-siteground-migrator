@@ -84,7 +84,7 @@
 				<tr>
 					<td class="body-text"
 						style="color: #363636; font-weight: 500; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 26px; line-height: 38px; padding: 0 0 25px 0">
-						<?php _e( 'Hello,', 'siteground-migrator' ); ?>
+						<?php esc_html_e( 'Hello,', 'siteground-migrator' ); ?>
 					</td>
 				</tr>
 				<tr>
@@ -92,11 +92,14 @@
 						style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
 						<?php
 							printf(
-								__(
-									'As you requested, we’ve tried to move a copy of <a href="%1$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">%1$s</a> to SiteGround. Unfortunately, the transfer failed due to restriction in the current hosting environment.',
-									'siteground-migrator'
+								wp_kses_post(
+									// translators: %1$s is the URL of the home page.
+									__(
+										'As you requested, we’ve tried to move a copy of <a href="%1$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">%1$s</a> to SiteGround. Unfortunately, the transfer failed due to restriction in the current hosting environment.',
+										'siteground-migrator'
+									)
 								),
-								get_home_url( '/' )
+								esc_url( get_home_url( '/' ) )
 							);
 						?>
 					</td>
@@ -106,12 +109,15 @@
 						style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 40px 0">
 						<?php
 							printf(
-								__(
-									'Please review <a href="%s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">our tutorial</a> for manual transfer or request a professional transfer from our Support Team by posting a ticket in your Help Desk under <a href="%s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">Website Transfer</a> category.',
-									'siteground-migrator'
+								wp_kses_post(
+									// translators: The placeholders are links to self-help articles.
+									__(
+										'Please review <a href="%1$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">our tutorial</a> for manual transfer or request a professional transfer from our Support Team by posting a ticket in your Help Desk under <a href="%2$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">Website Transfer</a> category.',
+										'siteground-migrator'
+									)
 								),
-								__( 'https://www.siteground.com/tutorials/wordpress/move-copy/', 'siteground-migrator' ),
-								__( 'https://ua.siteground.com/support/website_transfer.htm', 'siteground-migrator' )
+								esc_url( __( 'https://www.siteground.com/tutorials/wordpress/move-copy/', 'siteground-migrator' ) ),
+								esc_url( __( 'https://ua.siteground.com/support/website_transfer.htm', 'siteground-migrator' ) )
 							);
 						?>
 					</td>
@@ -119,7 +125,14 @@
 				<tr>
 					<td class="body-text"
 						style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
-						<?php _e( 'Best Regards, <br>The SiteGround Team', 'siteground-migrator' ) ?>
+						<?php
+						echo wp_kses_post(
+						    __(
+						        'Best Regards, <br>The SiteGround Team',
+						        'siteground-migrator'
+						    )
+						);
+						?>
 					</td>
 				</tr>
 

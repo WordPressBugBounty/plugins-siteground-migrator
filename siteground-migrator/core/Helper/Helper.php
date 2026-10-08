@@ -163,7 +163,7 @@ class Helper {
 	public static function is_flyweel() {
 		if (
 			isset( $_SERVER['SERVER_SOFTWARE'] ) &&
-			false !== stripos( $_SERVER['SERVER_SOFTWARE'], 'Flywheel' )
+			false !== stripos( sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ), 'Flywheel' )
 		) {
 			return true;
 		}

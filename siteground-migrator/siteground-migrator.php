@@ -24,7 +24,7 @@ use ShuttleExport\Exporter;
  * Plugin Name:       SiteGround Migrator
  * Plugin URI:        http://siteground.com
  * Description:       This plugin is designed to migrate your WordPress site to SiteGround
- * Version:           2.1.1
+ * Version:           2.1.2
  * Author:            SiteGround
  * Author URI:        https://www.siteground.com
  * License:           GPL-2.0+
@@ -40,7 +40,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 // Define version constant.
 if ( ! defined( __NAMESPACE__ . '\VERSION' ) ) {
-    define( __NAMESPACE__ . '\VERSION', '2.1.1' );
+    define( __NAMESPACE__ . '\VERSION', '2.1.2' );
 }
 
 // Define slug constant.
@@ -78,4 +78,3 @@ global $sg_migrator_loader;
 if ( ! isset( $sg_migrator_loader ) ) {
     $sg_migrator_loader = new Loader();
 }
-

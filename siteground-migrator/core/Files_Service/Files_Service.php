@@ -7,6 +7,7 @@ use SiteGround_Migrator\Directory_Service\Directory_Service;
 use SiteGround_Migrator\Api_Service\Api_Service;
 use SiteGround_Migrator\Transfer_Service\Transfer_Service;
 use SiteGround_Migrator\Helper\Helper;
+use SiteGround_Helper\Helper_Service;
 
 /**
  * The files service class.
@@ -35,6 +36,13 @@ class Files_Service {
 	private $api_service;
 
 	/**
+	 * The WP Filesystem placeholder.
+	 *
+	 * @since 2.1.0
+	 */
+	public $wp_filesystem;
+
+	/**
 	 * The constructor.
 	 *
 	 * @since 1.0.0
@@ -43,20 +51,21 @@ class Files_Service {
 
 		$this->directory_service = new Directory_Service();
 		$this->api_service       = new Api_Service();
+		$this->wp_filesystem     = Helper_Service::setup_wp_filesystem();
 	}
 
 	/**
 	 * Allow SiteGround server to
-	 * download php files via http.
+	 * download php files via HTTP.
 	 *
 	 * @since  1.0.0
 	 */
 	public function download_file_from_uploads() {
 		// Bail if the path parameter is not set.
-		if ( empty( $_GET['path'] ) ) {
+		if ( empty( $_GET['path'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->log_die( '`path` parameter is rquired.' );
 		}
-		$maybe_path = sanitize_text_field( wp_unslash( $_GET['path'] ) );
+		$maybe_path = sanitize_text_field( wp_unslash( $_GET['path'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Check if the request is made from SiteGround server.
 		$this->api_service->authenticate( $maybe_path );
@@ -67,7 +76,7 @@ class Files_Service {
 		// Bail if the path doesn't exist.
 		if ( false === $path ) {
 			$this->log_die(
-			// translators: The placeholder is the path to the file that we are trying to downlaod.
+			// translators: The placeholder is the path to the file that we are trying to download.
 				sprintf( 'The following filepath doesn\'t exist: %s', $path ) // phpcs:ignore WordPress.XSS.EscapeOutput
 			);
 		}
@@ -77,12 +86,12 @@ class Files_Service {
 
 		if ( empty( $cipher_content ) ) {
 			$this->log_die(
-			// translators: The placeholder is the path to the file that we are trying to downlaod.
+			// translators: The placeholder is the path to the file that we are trying to download.
 				sprintf( 'Error creating encrypted content for file: %s', $path ) // phpcs:ignore WordPress.XSS.EscapeOutput
 			);
 		}
 
-		die( $cipher_content ); // phpcs:ignore WordPress.XSS.EscapeOutput
+		die( $cipher_content ); // phpcs:ignore
 	}
 
 	/**
@@ -173,7 +182,6 @@ class Files_Service {
 			return false;
 		}
 
-		$wp_filesystem = $this->setup_wp_filesystem();
 		// Validate and build the path.
 		if ( Helper::is_flyweel() ) {
 			$source_path = $this->validate_and_build_path( $path );
@@ -191,11 +199,11 @@ class Files_Service {
 
 		// Delete the file if it exists and create fresh archive.
 		if ( file_exists( $archive_filename ) ) {
-			$wp_filesystem->delete( $archive_filename );
+			$this->wp_filesystem->delete( $archive_filename );
 		}
 
 		// Create the transfer directory.
-		$wp_filesystem->mkdir( $source_path . '-transfer' );
+		$this->wp_filesystem->mkdir( $source_path . '-transfer' );
 
 		// Copy the directory, so that we can manipulate the files without hurting performance.
 		\copy_dir( $source_path, $source_path . '-transfer' );
@@ -203,16 +211,18 @@ class Files_Service {
 		// SGS Encrypt file include.
 		if ( preg_match( '~plugins\/sg-security$~', $source_path ) ) {
 			// Copy the wp-content/sgs_encrypt_key.php into the plugin directory.
-			if ( $wp_filesystem->is_file( WP_CONTENT_DIR . '/sgs_encrypt_key.php' ) ) {
-				$wp_filesystem->copy( WP_CONTENT_DIR . '/sgs_encrypt_key.php', $source_path . '-transfer/sgs_encrypt_key.php' );
+			if ( $this->wp_filesystem->is_file( WP_CONTENT_DIR . '/sgs_encrypt_key.php' ) ) {
+				$this->wp_filesystem->copy( WP_CONTENT_DIR . '/sgs_encrypt_key.php', $source_path . '-transfer/sgs_encrypt_key.php' );
 			}
 		}
 
 		// Archvie the new directory.
-		$this->archive_dir( $source_path . '-transfer', $archive_filename );
+		if ( false === $this->archive_dir( $source_path . '-transfer', $archive_filename ) ) {
+			return false;
+		}
 
 		// Delete copy of the directory.
-		$wp_filesystem->delete( $source_path . '-transfer', true );
+		$this->wp_filesystem->delete( $source_path . '-transfer', true );
 
 		return $this->encrypt_and_delete_original( $archive_filename );
 	}
@@ -224,12 +234,19 @@ class Files_Service {
 	 *
 	 * @param string $source Directory to be compressed.
 	 * @param string $dest   Destination for the .tar file containing the compressed directory.
+	 *
+	 * @return bool False if the provided source path is missing or invalid for some reason.
 	 */
 	public function archive_dir( $source, $dest ) {
 		// Get real path for our folder.
 		$root_path = realpath( $source );
 
 		$renamed_files_map = '';
+
+		if ( empty( $root_path ) ) {
+			$this->log_error( 'The archive_dir() method received invalid source path.' );
+			return false;
+		}
 
 		// Create recursive directory iterator.
 		$files = new \RecursiveIteratorIterator(
@@ -245,6 +262,7 @@ class Files_Service {
 
 		// Open the map and add the map for the specific plugin, if needed.
 		if ( ! empty( $renamed_files_map ) ) {
+
 			$status = file_put_contents( trailingslashit( $root_path ) . '_sg_renamed_files_.map', $renamed_files_map, FILE_APPEND );
 
 			// Log error, if any.
@@ -268,7 +286,7 @@ class Files_Service {
 	 * @return bool True on success, false on failure
 	 */
 	public function create_transfer_manifest() {
-		// Get uploas dir.
+		// Get uploads dir.
 		$upload_dir = wp_upload_dir();
 
 		$content = $this->directory_service->get_upload_paths( $upload_dir['basedir'] ); // File content.
@@ -306,10 +324,9 @@ class Files_Service {
 	 * @return bool True on success, false on failure.
 	 */
 	private function create_encrypted_file( $filename, $content ) {
-		$wp_filesystem = $this->setup_wp_filesystem();
 
 		// Add the paths to the file.
-		if ( false === $wp_filesystem->put_contents( $filename, $content ) ) {
+		if ( false === $this->wp_filesystem->put_contents( $filename, $content ) ) {
 			$this->log_error( 'Error creating file.' );
 			return false;
 		}
@@ -334,16 +351,15 @@ class Files_Service {
 	 *                     to the file, or false on failure.
 	 */
 	public function encrypt_and_delete_original( $file ) {
-		$wp_filesystem = $this->setup_wp_filesystem();
 
 		// Get encrypted content of archive.
 		$encrypted_content = $this->get_encrypted_file_content( $file );
 
 		// Delete the original file.
-		$wp_filesystem->delete( $file );
+		$this->wp_filesystem->delete( $file );
 
 		// Create new file with encrypted content.
-		return $wp_filesystem->put_contents(
+		return $this->wp_filesystem->put_contents(
 			$file,
 			$encrypted_content
 		);
@@ -360,7 +376,6 @@ class Files_Service {
 	 * @return string $cipher_content File encrypted content.
 	 */
 	private function get_encrypted_file_content( $file ) {
-		$wp_filesystem = $this->setup_wp_filesystem();
 		// Bail if the file is empty.
 		if ( empty( $file ) ) {
 			$this->log_error( 'File parameter is required.' );
@@ -391,7 +406,7 @@ class Files_Service {
 		$cipher         = 'AES-128-CBC';
 		$ivlen          = openssl_cipher_iv_length( $cipher );
 		$iv             = openssl_random_pseudo_bytes( $ivlen );
-		$file_contents  = $wp_filesystem->get_contents( $file );
+		$file_contents  = $this->wp_filesystem->get_contents( $file );
 		$hash           = sha1( $file_contents, true );
 		$cipher_content = openssl_encrypt( $file_contents, $cipher, $key, OPENSSL_RAW_DATA, $iv );
 
@@ -400,25 +415,7 @@ class Files_Service {
 	}
 
 	/**
-	 * Load the global wp_filesystem.
-	 *
-	 * @since  1.0.0
-	 *
-	 * @return object The {@link Siteground_Migrator_Api_Service} instance.
-	 */
-	private function setup_wp_filesystem() {
-		global $wp_filesystem;
-
-		// Initialize the WP filesystem, no more using 'file-put-contents' function.
-		if ( empty( $wp_filesystem ) ) {
-			require_once( ABSPATH . '/wp-admin/includes/file.php' );
-			\WP_Filesystem();
-		}
-
-		return $wp_filesystem;
-	}
-	/**
-	 * Changes the name of the selected file and outputs the map to the old strucgture.
+	 * Changes the name of the selected file and outputs the map to the old structure.
 	 *
 	 * @since 2.0.0
 	 *

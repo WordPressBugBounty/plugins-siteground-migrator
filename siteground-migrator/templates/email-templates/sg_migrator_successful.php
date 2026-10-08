@@ -83,7 +83,7 @@
                 <tr>
                     <td class="body-text"
                         style="color: #363636; font-weight: 500; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 26px; line-height: 38px; padding: 0 0 25px 0">
-                        <?php _e( 'Hello,', 'siteground-migrator' ); ?>
+                        <?php esc_html_e( 'Hello,', 'siteground-migrator' ); ?>
                     </td>
                 </tr>
                 <tr>
@@ -91,11 +91,14 @@
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
                         <?php
                         printf(
-                            __(
-                                'A copy of <a href="%1$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">%1$s</a> has been successfully migrated to SiteGround, as you requested.',
-                                'siteground-migrator'
+                            wp_kses_post(
+                                    // translators: %1$s - the website's home URL.
+                                __(
+                                    'A copy of <a href="%1$s" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;">%1$s</a> has been successfully migrated to SiteGround, as you requested.',
+                                    'siteground-migrator'
+                                )
                             ),
-                            get_home_url( '/' )
+                            esc_html( get_home_url( '/' ) )
                         )
                         ?>
                     </td>
@@ -103,19 +106,19 @@
                 <tr>
                     <td class="body-text"
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
-                        <?php _e( 'You can preview the migrated website here:', 'siteground-migrator' ); ?>
+                        <?php esc_html_e( 'You can preview the migrated website here:', 'siteground-migrator' ); ?>
                     </td>
                 </tr>
                 <tr>
                     <td class="body-text"
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
-                        <a href="<?php echo $data['temp_url'] ?>" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;"><b><?php echo $data['temp_url'] ?></b></a>
+                        <a href="<?php echo esc_url( $data['temp_url'] ); ?>" target="_blank" rel="noreferrer" style="color: #22b8d1; outline: none; text-decoration: none;"><b><?php echo esc_url( $data['temp_url'] ); ?></b></a>
                     </td>
                 </tr>
                 <tr>
                     <td class="body-text"
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
-                        <?php _e( 'If your site looks as expected on the new location and you wish to complete the transfer, just point your domain name to SiteGround. To do this, please change your name servers to the following: ', 'siteground-migrator' ) ?>
+                        <?php esc_html_e( 'If your site looks as expected on the new location and you wish to complete the transfer, just point your domain name to SiteGround. To do this, please change your name servers to the following: ', 'siteground-migrator' ) ?>
                     </td>
                 </tr>
                 <tr>
@@ -133,7 +136,7 @@
                                         }
                                     ?>
                                         
-                                        <strong>NS<?php echo $counter + 1; ?>: <?php echo esc_html( $server ); ?></strong>
+                                        <strong>NS<?php echo esc_html( $counter + 1 ); ?>: <?php echo esc_html( $server ); ?></strong>
                                         <br>
                                     <?php endforeach ?>
                                 </td>
@@ -144,13 +147,27 @@
                 <tr>
                     <td class="body-text"
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 40px 0">
-                        <?php _e( '<b>Important:</b> It can take up to 48 hours for the nameserver changes to propagate. It’s very important to make no changes to your website during the transfer period to avoid data loss or data discrepancy.', 'siteground-migrator' ) ?>
+                        <?php
+                        echo wp_kses_post(
+                            __(
+                                '<b>Important:</b> It can take up to 48 hours for the nameserver changes to propagate. It’s very important to make no changes to your website during the transfer period to avoid data loss or data discrepancy.',
+                                'siteground-migrator'
+                            )
+                        );
+                        ?>
                     </td>
                 </tr>
                 <tr>
                     <td class="body-text"
                         style="color: #444444; font-weight: 400; font-family: 'Open Sans', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 26px; padding: 0px 0 25px 0">
-                        <?php _e( 'Best Regards, <br>The SiteGround Team', 'siteground-migrator' ) ?>
+                        <?php
+                        echo wp_kses_post(
+                            __(
+                                'Best Regards, <br>The SiteGround Team',
+                                'siteground-migrator'
+                            )
+                        );
+                        ?>
                     </td>
                 </tr>
 

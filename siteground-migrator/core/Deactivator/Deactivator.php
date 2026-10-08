@@ -11,7 +11,7 @@ use SiteGround_Migrator\Transfer_Service\Transfer_Service;
 class Deactivator {
 
 	/**
-	 * Delete temp dirrectory upon plugin deactivation.
+	 * Delete temp directory upon plugin deactivation.
 	 *
 	 * @since    1.0.0
 	 */
@@ -28,10 +28,12 @@ class Deactivator {
 		global $wpdb;
 
 		// Delete the plugin options.
-		$result = $wpdb->get_results( "
-			DELETE
-			FROM $wpdb->options
-			WHERE `option_name` LIKE 'siteground_migrator_%'"
+		$result = $wpdb->get_results( //phpcs:ignore
+			$wpdb->prepare(
+				'DELETE FROM ' . esc_sql( $wpdb->options ) . '
+				WHERE `option_name` LIKE %s ',
+				$wpdb->esc_like( 'siteground_migrator_' ) . '%'
+			)
 		);
 	}
 }

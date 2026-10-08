@@ -96,7 +96,7 @@ class Transfer_Service {
 	 * @since 1.0.0
 	 */
 	public function __construct() {
-		// Set the api service.
+		// Set the API service.
 		$this->api_service        = new Api_Service();
 		$this->file_service       = new Files_Service();
 		$this->database_service   = new Database_Service();
@@ -128,8 +128,8 @@ class Transfer_Service {
 	public function hide_errors_and_notices() {
 		// Hide all error on our dashboard.
 		if (
-			isset( $_GET['page'] ) &&
-			'siteground-migrator' === $_GET['page']
+			isset( $_GET['page'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'siteground-migrator' === $_GET['page'] // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			remove_all_actions( 'network_admin_notices' );
 			remove_all_actions( 'user_admin_notices' );
@@ -139,11 +139,11 @@ class Transfer_Service {
 	}
 
 	/**
-	 * Check the current hosting enviroment before starting the transfer.
+	 * Check the current hosting environment before starting the transfer.
 	 *
 	 * @since  1.0.26
 	 *
-	 * @return bool True if the enviromenment has issues, false otherwise.
+	 * @return bool True if the environment has issues, false otherwise.
 	 */
 	public function check_environment_before_transfer() {
 		// Requre the file so is_plugin_active is available.
@@ -246,6 +246,7 @@ class Transfer_Service {
 		if ( untrailingslashit( $src_url ) !== untrailingslashit( $dst_url ) ) {
 			self::update_status(
 				sprintf(
+					// translators: %s is the new URL, the website will be transferred to.
 					esc_html__(
 						'Site domain to be changed to %s',
 						'siteground-migrator'
@@ -480,31 +481,31 @@ class Transfer_Service {
 	}
 
 	/**
-	 * Handle transfer status updates from remote api.
+	 * Handle transfer status updates from remote API.
 	 *
 	 * @since  1.0.0
 	 */
 	public function update_transfer_status_endpoint() {
 		// Bail if the data parameter is not set.
-		if ( empty( $_POST['data'] ) ) {
+		if ( empty( $_POST['data'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			$this->log_die( '`data` parameter is required.' );
 		}
 
-		// Authenitcate the request.
-		$this->api_service->authenticate( stripcslashes( $_POST['data'] ) );
+		// Authenticate the request.
+		$this->api_service->authenticate( stripcslashes( $_POST['data'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		// Convert the data to array.
-		$data = json_decode( sanitize_text_field( wp_unslash( $_POST['data'] ) ), true );
+		$data = json_decode( sanitize_text_field( wp_unslash( $_POST['data'] ) ), true ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
 
 		$step = 5;
 
 		$current_step = get_option( 'siteground_migrator_current_step', 0 );
 
-		// Translate the message from out api.
+		// Translate the message from out API.
 		// See http://keithdevon.com/using-variables-wordpress-translation-functions/.
-		$data['message'] = __( $data['message'], 'siteground-migrator' );
+		$data['message'] = __( $data['message'], 'siteground-migrator' ); // phpcs:ignore
 
 		if ( ! empty( $data['description'] ) ) {
-			$data['description'] = __( $data['description'], 'siteground-migrator' );
+			$data['description'] = __( $data['description'], 'siteground-migrator' ); // phpcs:ignore
 		}
 
 		// Very ugly way to prevent unwanted messages to be displayed.
@@ -524,6 +525,7 @@ class Transfer_Service {
 			if ( isset( $data['tot_files'] ) ) {
 				// Calculate the step to update the progress bar.
 				$step            = 30 / ( $data['tot_files'] / 20 );
+				// translators: %1$s is the URL of the home page.
 				$data['message'] = sprintf( __( 'Downloaded %1$d out of %2$d files...', 'siteground-migrator' ), $data['n_file'], $data['tot_files'] );
 			}
 

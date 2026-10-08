@@ -35,7 +35,7 @@ trait Log_Service_Trait {
 		error_log(
 			sprintf(
 				"[%s] %s: %s \n",
-				date( 'd-M-Y H:i:s e' ),
+				gmdate( 'd-M-Y H:i:s e' ),
 				$level,
 				is_array( $message ) ? implode( ', ', $message ) : $message
 			),
@@ -77,7 +77,6 @@ trait Log_Service_Trait {
 		$this->log( 'ERROR', $message );
 
 		// translators: `$message` the error message that will be displayed.
-		wp_die( $message, '', array( 'response' => 400 ) ); // phpcs:ignore WordPress.XSS.EscapeOutput
+		wp_die( esc_html( $message ), '', array( 'response' => 400 ) ); // phpcs:ignore WordPress.XSS.EscapeOutput
 	}
-
 }

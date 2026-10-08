@@ -49,7 +49,7 @@ class Activator {
 
 		// Set the directory is it's empty.
 		if ( empty( $temp_dir ) ) {
-			update_option( 'siteground_migrator_temp_directory', time() . '-' . sha1( mt_rand() ) );
+			update_option( 'siteground_migrator_temp_directory', time() . '-' . sha1( wp_rand() ) );
 		}
 	}
 
@@ -85,14 +85,18 @@ class Activator {
 	 */
 	public function siteground_migrator_compatability_warning() {
 		printf(
-			__( '<div class="error"><p>“%1$s” requires PHP %2$s (or newer) to function properly. Your site is using PHP %3$s. Please upgrade. The plugin has been automatically deactivated.</p></div>', 'siteground-migrator' ),
+			wp_kses_post(
+				'<div class="error"><p>' .
+				// translators: “%1$s” - the plugin's name, %2$s - the required PHP version, %3$s - the current PHP version of the website.
+				__( '“%1$s” requires PHP %2$s (or newer) to function properly. Your site is using PHP %3$s. Please upgrade. The plugin has been automatically deactivated.', 'siteground-migrator' ) . '</p></div>'
+			),
 			'SiteGround Migrator',
 			'7.0',
 			PHP_VERSION
 		);
 
 		// Hide "Plugin activated" message.
-		if ( isset( $_GET['activate'] ) ) {
+		if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			unset( $_GET['activate'] );
 		}
 	}
@@ -103,10 +107,14 @@ class Activator {
 	 * @since  1.0.1
 	 */
 	public function siteground_migrator_multisite_warning() {
-		_e( '<div class="error"><p>This plugin does not support full Multise Network migrations.</p></div>', 'siteground-migrator' );
+
+		echo '<div class="error"><p>' . esc_html__(
+		    'This plugin does not support full Multisite Network migrations.',
+		    'siteground-migrator'
+		) . '</p></div>';
 
 		// Hide "Plugin activated" message.
-		if ( isset( $_GET['activate'] ) ) {
+		if ( isset( $_GET['activate'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			unset( $_GET['activate'] );
 		}
 	}

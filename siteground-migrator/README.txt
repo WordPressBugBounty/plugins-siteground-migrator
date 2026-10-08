@@ -4,8 +4,8 @@ License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl.html
 Tags: Transfer, Migration, SiteGround, automatic transfer, automatic migration
 Requires at least: 4.8
-Tested up to: 7.0
-Stable tag: 2.1.1
+Tested up to: 7.1
+Stable tag: 2.1.2
 Requires PHP: 5.6.0
 
 Transfer your WordPress website to SiteGround without any hassle in a completely automated way using SiteGround Migrator.
@@ -14,15 +14,15 @@ Transfer your WordPress website to SiteGround without any hassle in a completely
 
 = SiteGround Migrator: the easiest way to move your site to SiteGround =
 
-This plugin is designed to automate the transfer of a WordPress instance to a SiteGround hosting account. It can't be used to transfer a WordPress instance to another hosting provider. 
+This plugin is designed to automate the transfer of a WordPress instance to a SiteGround hosting account. It can't be used to transfer a WordPress instance to another hosting provider.
 
 Important: This solution is not suitable for migrating localhost WordPress sites or for Full Multisite installations (separate Multisite blogs are fine).
 
 = How to Use =
 
-First, you need to get a transfer token from your SiteGround account. You can do this through the WordPress Migrator tool located in the WordPress section of your SiteGround hosting control panel. 
+First, you need to get a transfer token from your SiteGround account. You can do this through the WordPress Migrator tool located in the WordPress section of your SiteGround hosting control panel.
 
-Once you select the domain name that you want to initiate the transfer for, our system will generate a transfer token for you.Paste the token in your SiteGround Migrator plugin and press Initiate Transfer. That's all! 
+Once you select the domain name that you want to initiate the transfer for, our system will generate a transfer token for you.Paste the token in your SiteGround Migrator plugin and press Initiate Transfer. That's all!
 
 == Installation ==
 
@@ -46,6 +46,12 @@ In version 1.0.13 we've added WP-CLI command for migrations.
 * wp migrator start transfertoken --email=your@email.com
 
 == Changelog ==
+= Version 2.1.2 =
+Release Date: Oct 8th, 2026
+
+* Environmental check improvements
+* Code Improvements
+
 = Version 2.1.1 =
 Release Date: Jun 22th, 2026
 
@@ -286,7 +292,7 @@ We move only your WordPress content - themes, plugins, uploads. If you have othe
 
 = Does it work only with cPanel hosts? =
 
-No, we strive to make our plugin work flawlessly on every hosting environment. 
+No, we strive to make our plugin work flawlessly on every hosting environment.
 
 = Transfer is completed but I didn't get a notification? =
 

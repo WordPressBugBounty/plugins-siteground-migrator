@@ -10,7 +10,7 @@ use SiteGround_Migrator\Directory_Service\Directory_Service;
  * Handle all request to SiteGround API.
  *
  * This class defines all code necessary to make requests to SiteGround API.
- * It also provides information about the current installtion and authenticaion.
+ * It also provides information about the current installation and authentication.
  */
 class Api_Service {
 	use Log_Service_Trait;
@@ -44,7 +44,7 @@ class Api_Service {
 	 *
 	 * @since  1.0.0
 	 *
-	 * @return array Array containg the information above.
+	 * @return array Array containing the information above.
 	 */
 	public function get_installation_info() {
 		global $wp_version;
@@ -93,25 +93,25 @@ class Api_Service {
 	}
 
 	/**
-	 * Retrieve the server ip address.
+	 * Retrieve the server IP address.
 	 *
 	 * @since  1.0.0
 	 *
 	 * @return string $ip_address The server IP address.
 	 */
 	private function get_ip_address() {
-		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
-			$ip_address = $_SERVER['HTTP_CLIENT_IP']; // WPCS: sanitization ok.
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) { // phpcs:ignore
+			$ip_address = $_SERVER['HTTP_CLIENT_IP']; // phpcs:ignore
 		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
-			$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR']; // WPCS: sanitization ok.
+			$ip_address = $_SERVER['HTTP_X_FORWARDED_FOR']; // phpcs:ignore
 		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED'] ) ) {
-			$ip_address = $_SERVER['HTTP_X_FORWARDED']; // WPCS: sanitization ok.
+			$ip_address = $_SERVER['HTTP_X_FORWARDED']; // phpcs:ignore
 		} elseif ( ! empty( $_SERVER['HTTP_FORWARDED_FOR'] ) ) {
-			$ip_address = $_SERVER['HTTP_FORWARDED_FOR']; // WPCS: sanitization ok.
+			$ip_address = $_SERVER['HTTP_FORWARDED_FOR']; // phpcs:ignore
 		} elseif ( ! empty( $_SERVER['HTTP_FORWARDED'] ) ) {
-			$ip_address = $_SERVER['HTTP_FORWARDED']; // WPCS: sanitization ok.
+			$ip_address = $_SERVER['HTTP_FORWARDED']; // phpcs:ignore
 		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
-			$ip_address = $_SERVER['REMOTE_ADDR']; // WPCS: sanitization ok.
+			$ip_address = $_SERVER['REMOTE_ADDR']; // phpcs:ignore
 		} else {
 			$ip_address = 'UNKNOWN';
 		}
@@ -124,7 +124,7 @@ class Api_Service {
 	 *
 	 * @since  1.0.0
 	 *
-	 * @param  string $data json encoded representation of the data.
+	 * @param  string $data JSON encoded representation of the data.
 	 *
 	 * @return string $api_query Query string containing all data params.
 	 */
@@ -164,14 +164,14 @@ class Api_Service {
 		// Create the authentication hash.
 		$auth = sha1( $this->prepare_verify_request( $data ) . $transfer_psk );
 
-		// Prepare the json encoded data for the request.
-		$json_data = json_encode(
+		// Prepare the JSON encoded data for the request.
+		$json_data = wp_json_encode(
 			array(
 				'data' => $data,
 			)
 		);
 
-		// Send request to SG api.
+		// Send request to SG API.
 		$response = wp_remote_post(
 		// Add the auth parameter to endpoint.
 			add_query_arg( 'auth', $auth, self::API_URL . $api_endpoint . $transfer_id ),
@@ -194,7 +194,7 @@ class Api_Service {
 	}
 
 	/**
-	 * Prepare response message using the response from the api.
+	 * Prepare response message using the response from the API.
 	 *
 	 * @since  1.0.0
 	 *
@@ -219,10 +219,10 @@ class Api_Service {
 		// Retrieve the response body.
 		$response_body = json_decode( wp_remote_retrieve_body( $response ) );
 
-		// Get the responce body from the old Migrator API transfer_info.
+		// Get the response body from the old Migrator API transfer_info.
 		$transfer_info = ! empty( $response_body->transfer_info ) ? $response_body->transfer_info : '';
 
-		// Get the responce body from new Migrator API data->transfer_info array.
+		// Get the response body from new Migrator API data->transfer_info array.
 		if ( isset( $response_body->data->transfer_info ) ) {
 			$transfer_info = $response_body->data->transfer_info;
 		}
@@ -284,15 +284,15 @@ class Api_Service {
 	public function authenticate( $key ) {
 		// Bail if any of required parameters is missing.
 		if (
-			empty( $_GET['transfer_id'] ) ||
-			empty( $_GET['ts'] ) ||
-			empty( $_GET['auth'] )
+			empty( $_GET['transfer_id'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			empty( $_GET['ts'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			empty( $_GET['auth'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			$this->log_die( '`transfer_id`, `ts` & `auth` parameters are required.' );
 		}
 
 		// Get the time diff between current timestamp and `ts` param.
-		$time_diff = time() - sanitize_text_field( wp_unslash( $_GET['ts'] ) );
+		$time_diff = time() - sanitize_text_field( wp_unslash( $_GET['ts'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Bail if the transfer timestamp is not valid.
 		if (
@@ -307,15 +307,15 @@ class Api_Service {
 		$transfer_id = get_option( 'siteground_migrator_transfer_id' );
 
 		// Bail if the transfer id is not valid.
-		if ( $transfer_id !== $_GET['transfer_id'] ) {
+		if ( $transfer_id !== $_GET['transfer_id'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->log_die( 'Transfer id is invalid.' );
 		}
 
-		// Generate authentication token.
-		$auth = sha1( $transfer_id . '-' . $key . '-' . get_option( 'siteground_migrator_transfer_psk' ) . '-' . $_GET['ts'] ); // input var ok; sanitization ok.
+		// Generate authentication token, input var ok; sanitization ok.
+		$auth = sha1( $transfer_id . '-' . $key . '-' . get_option( 'siteground_migrator_transfer_psk' ) . '-' . $_GET['ts'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		// Bail if the auth param doens't exists or if the auth is not valid.
-		if ( $auth !== $_GET['auth'] ) {
+		// Bail if the auth param doesn't exists or if the auth is not valid.
+		if ( $auth !== $_GET['auth'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$this->log_die( 'Authentication doesn\'t match.' );
 		}
 
@@ -323,7 +323,7 @@ class Api_Service {
 	}
 
 	/**
-	 * Send json success which means the plugin is installed.
+	 * Send JSON success which means the plugin is installed.
 	 *
 	 * @since  1.0.0.
 	 */

@@ -29,6 +29,7 @@ class Admin {
 		'onthego-admin-styles', // Toolset Types
 		'foogra-icons', // Foogra Theme
 		'elegant', // Elegant Icons-set
+		'admin-icons-font', // Yoga-fit Theme
 	);
 
 	/**
@@ -87,7 +88,7 @@ class Admin {
 		);
 
 		// Pass the serialized data and page_id.
-		echo '<script>window.addEventListener("load", function(){ SGMigrator.init({ domElementId: "root", page: SGMigrator.PAGE.' . $id . ',config:' . json_encode( $data ) . '})});</script>';
+		echo '<script>window.addEventListener("load", function(){ SGMigrator.init({ domElementId: "root", page: SGMigrator.PAGE.' . esc_html( $id ) . ',config:' . wp_json_encode( $data ) . '})});</script>';
 	}
 
 	/**
